@@ -5,11 +5,8 @@ import confetti from 'canvas-confetti';
 import { playSound } from '../utils/soundEffects';
 import MascotRenderer, { BASE_MASCOTS } from '../components/MascotRenderer';
 
-export default function ResultScreen({ score, name, mascot, equippedSkins, subject, onReplay, onGoHome }) {
+export default function ResultScreen({ score, earnedStars, name, mascot, equippedSkins, subject, onReplay, onGoHome }) {
   
-  // Trọng số thưởng sao: Mỗi câu đúng được 2 sao! Nếu đúng 10/10 thưởng thêm 10 sao!
-  const starsEarned = score * 2 + (score === 10 ? 10 : 0);
-
   const currentMascotInfo = BASE_MASCOTS[mascot] || BASE_MASCOTS.knight;
 
   // Kích hoạt confetti và âm thanh chiến thắng khi mount
@@ -50,8 +47,8 @@ export default function ResultScreen({ score, name, mascot, equippedSkins, subje
         title: 'THIÊN TÀI TOÁN HỌC!',
         colorClass: 'text-amber-500',
         badgeBg: 'bg-amber-100 border-amber-400',
-        mascotMsg: `Quá xuất sắc ${name} ơi! Bé đã trả lời đúng hoàn hảo cả 10 câu hỏi và rinh thêm 10 Sao may mắn nữa! ${mascotNameShort} tự hào về bé lắm! 🌟`,
-        starsBonus: '+30 Sao!'
+        mascotMsg: `Quá xuất sắc ${name} ơi! Bé đã trả lời đúng hoàn hảo cả 10 câu hỏi! ${mascotNameShort} tự hào về bé lắm! 🌟`,
+        starsBonus: `+${earnedStars} Sao!`
       };
     } else if (score >= 8) {
       return {
@@ -60,7 +57,7 @@ export default function ResultScreen({ score, name, mascot, equippedSkins, subje
         colorClass: 'text-yellow-500',
         badgeBg: 'bg-yellow-50 border-yellow-300',
         mascotMsg: `Tuyệt vời ông mặt trời! Bé ${name} làm đúng gần hết luôn. Lần sau cố gắng đạt điểm tối đa cùng ${mascotNameShort} nhé! 💪`,
-        starsBonus: `+${starsEarned} Sao!`
+        starsBonus: `+${earnedStars} Sao!`
       };
     } else if (score >= 5) {
       return {
@@ -69,7 +66,7 @@ export default function ResultScreen({ score, name, mascot, equippedSkins, subje
         colorClass: 'text-slate-500',
         badgeBg: 'bg-slate-100 border-slate-300',
         mascotMsg: `Chúc mừng bé ${name} đã vượt qua thử thách thành công! Tích thêm sao để ghé shop mua đồ đẹp cho ${mascotNameShort} nha! 🎈`,
-        starsBonus: `+${starsEarned} Sao!`
+        starsBonus: `+${earnedStars} Sao!`
       };
     } else {
       return {
@@ -78,7 +75,7 @@ export default function ResultScreen({ score, name, mascot, equippedSkins, subje
         colorClass: 'text-orange-500',
         badgeBg: 'bg-orange-100 border-orange-300',
         mascotMsg: `Không sao đâu bé ${name} ơi! Ôn luyện lại một chút cùng ${mascotNameShort} rồi thử thách tiếp nha, tớ tin bé sẽ làm được! 🦖`,
-        starsBonus: `+${starsEarned} Sao!`
+        starsBonus: `+${earnedStars} Sao!`
       };
     }
   };

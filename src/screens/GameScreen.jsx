@@ -12,6 +12,8 @@ export default function GameScreen({ subject, name, mascot, equippedSkins, onFin
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [isAnswered, setIsAnswered] = useState(false);
   const [score, setScore] = useState(0);
+  const [earnedStars, setEarnedStars] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(30);
   
   // Trạng thái linh vật cổ vũ
   const [mascotStatus, setMascotStatus] = useState('idle'); // 'idle' | 'happy' | 'sad'
@@ -25,8 +27,30 @@ export default function GameScreen({ subject, name, mascot, equippedSkins, onFin
     setSelectedAnswer(null);
     setIsAnswered(false);
     setScore(0);
+    setEarnedStars(0);
+    setTimeLeft(30);
     setMascotStatus('idle');
   }, [subject]);
+
+  useEffect(() => {
+    if (isAnswered || questions.length === 0) return;
+    
+    if (timeLeft <= 0) {
+      if (!isAnswered) {
+        playSound('wrong');
+        setIsAnswered(true);
+        setMascotStatus('sad');
+        setMascotSpeech(`Hết giờ mất rồi ${name} ơi! Đáp án đúng là ${questions[currentIndex].correctAnswer} nha. Luyện tập thêm nào! ⏰`);
+      }
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft(prev => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft, isAnswered, questions, currentIndex, name]);
 
   // Cập nhật lời thoại mascot khi đổi câu hỏi
   useEffect(() => {
@@ -69,10 +93,16 @@ export default function GameScreen({ subject, name, mascot, equippedSkins, onFin
     if (isCorrect) {
       playSound('correct');
       setScore(prev => prev + 1);
+      
+      let starsToAdd = 1;
+      if (timeLeft >= 20) starsToAdd = 3;
+      else if (timeLeft >= 10) starsToAdd = 2;
+      
+      setEarnedStars(prev => prev + starsToAdd);
       setMascotStatus('happy');
       
       const praises = [
-        `Bé ${name} xuất sắc quá! Đúng rồi kìa! 🥳`,
+        `Bé ${name} xuất sắc quá! Nhận được ${starsToAdd} sao kìa! 🥳`,
         `Tính siêu nhanh luôn ${name} ơi! Quá chuẩn! 🌟`,
         `Tuyệt vời! ${name} thông minh lắm nha! 🎉`
       ];
@@ -90,9 +120,10 @@ export default function GameScreen({ subject, name, mascot, equippedSkins, onFin
       setCurrentIndex(prev => prev + 1);
       setSelectedAnswer(null);
       setIsAnswered(false);
+      setTimeLeft(30);
     } else {
       // Hoàn thành 10 câu
-      onFinish(score);
+      onFinish({ correctCount: score, earnedStars });
     }
   };
 
@@ -127,9 +158,14 @@ export default function GameScreen({ subject, name, mascot, equippedSkins, onFin
         <div className="w-full mb-3.5 z-10">
           <div className="flex items-center justify-between text-[10px] font-black text-slate-600 mb-1.5 uppercase tracking-wide">
             <span>Câu hỏi: {currentIndex + 1} / {questions.length}</span>
-            <span className="text-emerald-600 flex items-center gap-1 font-bold">
-              Đúng: <strong className="text-xs text-emerald-700">{score}</strong> ⭐
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="flex items-center gap-1 font-bold text-rose-600 bg-rose-100 px-2 py-0.5 rounded-full border border-rose-300 shadow-sm animate-pulse">
+                ⏱️ {timeLeft}s
+              </span>
+              <span className="text-emerald-600 flex items-center gap-1 font-bold">
+                Đúng: <strong className="text-xs text-emerald-700">{score}</strong> ⭐
+              </span>
+            </div>
           </div>
           
           {/* Progress Bar Cartoon */}

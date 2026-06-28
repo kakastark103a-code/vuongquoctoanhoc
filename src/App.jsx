@@ -23,6 +23,7 @@ export default function App() {
 
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [currentScore, setCurrentScore] = useState(0);
+  const [currentEarnedStars, setCurrentEarnedStars] = useState(0);
 
   // Phát nhạc khi bé bắt đầu tương tác với trang (Tránh block autoplay của trình duyệt)
   useEffect(() => {
@@ -91,11 +92,10 @@ export default function App() {
     setScreen('game');
   };
 
-  const handleGameFinish = (finalScore) => {
-    setCurrentScore(finalScore);
+  const handleGameFinish = ({ correctCount, earnedStars }) => {
+    setCurrentScore(correctCount);
+    setCurrentEarnedStars(earnedStars);
     
-    // Tính toán số sao thưởng: 2 sao cho mỗi câu đúng, đúng hết 10/10 thưởng thêm 10 sao
-    const earnedStars = finalScore * 2 + (finalScore === 10 ? 10 : 0);
     const newTotalStars = stars + earnedStars;
     
     setStars(newTotalStars);
@@ -297,6 +297,7 @@ export default function App() {
               >
                 <ResultScreen 
                   score={currentScore} 
+                  earnedStars={currentEarnedStars}
                   name={name}
                   mascot={mascot}
                   equippedSkins={equippedSkins}

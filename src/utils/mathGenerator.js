@@ -422,49 +422,63 @@ const generateConversionQuestion = () => {
       options: generateConversionOptions(correctAnswer)
     };
   } else if (chosenType === 'time') {
-    const timeQuestions = [
-      { q: '1 giờ 15 phút = ... phút', ans: 75, options: [75, 115, 60, 15] },
-      { q: '1 giờ 30 phút = ... phút', ans: 90, options: [90, 130, 60, 30] },
-      { q: '2 giờ = ... phút', ans: 120, options: [120, 200, 60, 12] },
-      { q: '2 phút 30 giây = ... giây', ans: 150, options: [150, 230, 120, 30] },
-      { q: '3 phút = ... giây', ans: 180, options: [180, 300, 60, 18] },
-      { q: '2 ngày = ... giờ', ans: 48, options: [48, 24, 200, 480] },
-      { q: '3 ngày = ... giờ', ans: 72, options: [72, 36, 300, 720] },
-      { q: '2 thế kỷ = ... năm', ans: 200, options: [200, 20, 2000, 100] },
-      { q: '5 thế kỷ = ... năm', ans: 500, options: [500, 50, 5000, 1000] },
-      { q: '1 năm 6 tháng = ... tháng', ans: 18, options: [18, 16, 12, 180] }
+    const timeFormats = [
+      { unit1: 'giờ', unit2: 'phút', factor: 60 },
+      { unit1: 'phút', unit2: 'giây', factor: 60 },
+      { unit1: 'ngày', unit2: 'giờ', factor: 24 },
+      { unit1: 'thế kỷ', unit2: 'năm', factor: 100 },
+      { unit1: 'năm', unit2: 'tháng', factor: 12 }
     ];
-    const item = timeQuestions[getRandomInt(0, timeQuestions.length - 1)];
-    const correctAnswer = item.ans;
+    const fmt = timeFormats[getRandomInt(0, timeFormats.length - 1)];
+    const val1 = getRandomInt(1, 5);
+    let val2 = 0;
+    
+    if (getRandomInt(0, 1) === 1 && fmt.unit1 !== 'ngày' && fmt.unit1 !== 'thế kỷ') {
+      if (fmt.unit1 === 'năm') val2 = getRandomInt(1, 11);
+      else val2 = getRandomInt(1, 11) * 5;
+    }
+    
+    const correctAnswer = (val1 * fmt.factor) + val2;
+    let qStr = `${val1} ${fmt.unit1}`;
+    if (val2 > 0) qStr += ` ${val2} ${fmt.unit2}`;
+    qStr += ` = ... ${fmt.unit2}`;
 
     return {
       type: 'conversion',
       questionText: `Đồng Hồ Kỳ Diệu`,
-      questionSubText: `Bé hãy đổi đơn vị thời gian sau: ${item.q}`,
+      questionSubText: `Bé hãy đổi đơn vị thời gian sau: ${qStr}`,
       correctAnswer,
-      options: shuffleArray(item.options)
+      options: generateConversionOptions(correctAnswer)
     };
   } else {
     // Thử thách "Cân bằng" (Hỗn hợp)
-    const mixedConversions = [
-      { q: '2 tấn 5 tạ = ... kg', ans: 2500, options: [2500, 250, 2050, 25000] },
-      { q: '1 tấn 200 kg = ... kg', ans: 1200, options: [1200, 1020, 12000, 120] },
-      { q: '3 tạ 50 kg = ... kg', ans: 350, options: [350, 3050, 3500, 35] },
-      { q: '3m 4cm = ... cm', ans: 304, options: [304, 340, 34, 3004] },
-      { q: '5m 2dm = ... dm', ans: 52, options: [52, 502, 520, 5020] },
-      { q: '2dm 5mm = ... mm', ans: 205, options: [205, 250, 25, 2005] },
-      { q: '4 kg 200 g = ... g', ans: 4200, options: [4200, 4020, 42000, 420] },
-      { q: '1 kg 50g = ... g', ans: 1050, options: [1050, 1500, 105, 150] }
+    const mixedFormats = [
+      { unit1: 'tấn', unit2: 'kg', factor: 1000 },
+      { unit1: 'tạ', unit2: 'kg', factor: 100 },
+      { unit1: 'yến', unit2: 'kg', factor: 10 },
+      { unit1: 'm', unit2: 'cm', factor: 100 },
+      { unit1: 'm', unit2: 'dm', factor: 10 },
+      { unit1: 'dm', unit2: 'mm', factor: 100 },
+      { unit1: 'kg', unit2: 'g', factor: 1000 }
     ];
-    const item = mixedConversions[getRandomInt(0, mixedConversions.length - 1)];
-    const correctAnswer = item.ans;
+    const fmt = mixedFormats[getRandomInt(0, mixedFormats.length - 1)];
+    const val1 = getRandomInt(1, 9);
+    let val2 = 0;
+    if (fmt.factor === 1000) val2 = getRandomInt(1, 9) * 10;
+    else if (fmt.factor === 100) val2 = getRandomInt(1, 9) * 5;
+    else val2 = getRandomInt(1, 9);
+    
+    if (val2 >= fmt.factor) val2 = fmt.factor - 1;
+
+    const correctAnswer = (val1 * fmt.factor) + val2;
+    const qStr = `${val1} ${fmt.unit1} ${val2} ${fmt.unit2} = ... ${fmt.unit2}`;
 
     return {
       type: 'conversion',
       questionText: `Thử Thách Cân Bằng`,
-      questionSubText: `Bé hãy quy đổi và gộp đơn vị đo sau: ${item.q}`,
+      questionSubText: `Bé hãy quy đổi và gộp đơn vị đo sau: ${qStr}`,
       correctAnswer,
-      options: shuffleArray(item.options)
+      options: generateConversionOptions(correctAnswer)
     };
   }
 };
@@ -548,17 +562,28 @@ const generateAreaQuestion = () => {
  */
 export const generateQuestionSet = (subject) => {
   const questionSet = [];
-  for (let i = 0; i < 10; i++) {
+  const usedKeys = new Set();
+  
+  let attempts = 0; // Prevent infinite loop in worst case
+  while (questionSet.length < 10 && attempts < 100) {
+    attempts++;
+    let q;
     if (subject === 'multiplication') {
-      questionSet.push(generateMultiplicationQuestion());
+      q = generateMultiplicationQuestion();
     } else if (subject === 'division') {
-      questionSet.push(generateDivisionQuestion());
+      q = generateDivisionQuestion();
     } else if (subject === 'conversion') {
-      questionSet.push(generateConversionQuestion());
+      q = generateConversionQuestion();
     } else if (subject === 'area') {
-      questionSet.push(generateAreaQuestion());
+      q = generateAreaQuestion();
     } else {
-      questionSet.push(generateGeometryQuestion());
+      q = generateGeometryQuestion();
+    }
+    
+    const key = q.questionSubText;
+    if (!usedKeys.has(key)) {
+      usedKeys.add(key);
+      questionSet.push(q);
     }
   }
   return questionSet;
