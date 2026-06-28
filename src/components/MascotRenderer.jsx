@@ -190,9 +190,9 @@ export const SHOP_ITEMS = [
 
 const processedImageCache = {};
 
-export default function MascotRenderer({ 
-  mascot = 'knight', 
-  equippedSkins = [], 
+export default function MascotRenderer({
+  mascot = 'knight',
+  equippedSkins = [],
   status = 'idle', // 'idle' | 'happy' | 'sad'
   size = 'md' // 'sm' | 'md' | 'lg'
 }) {
@@ -236,27 +236,44 @@ export default function MascotRenderer({
         const w = canvas.width;
         const h = canvas.height;
 
-        // Thuật toán Loang (Flood fill) từ 4 góc để xác định vùng nền
+        // Thuật toán Loang (Flood fill) để xác định vùng nền
         const visited = new Uint8Array(w * h);
         const queue = [];
 
-        // Kiểm tra xem một điểm pixel có phải là màu nền trắng hay không (R, G, B > 235)
+        // Kiểm tra xem một điểm pixel có phải là màu nền trắng hay không (R, G, B > threshold)
         const isBg = (x, y) => {
           const idx = (y * w + x) * 4;
           const r = data[idx];
           const g = data[idx + 1];
           const b = data[idx + 2];
-          return r > 235 && g > 235 && b > 235;
+          
+          // Tính khoảng cách tới biên gần nhất
+          const distFromEdgeX = Math.min(x, w - 1 - x);
+          const distFromEdgeY = Math.min(y, h - 1 - y);
+          const minDist = Math.min(distFromEdgeX, distFromEdgeY);
+          
+          // Sử dụng ngưỡng thấp ở sát biên để xóa sạch bóng mờ vignette ở các góc
+          // Sử dụng ngưỡng rất cao ở gần nhân vật để tránh ăn lẹm vào người thỏ
+          let threshold = 245;
+          if (minDist < 15) {
+            threshold = 190; // Sát rìa: quét sạch bóng xám
+          } else if (minDist < 35) {
+            threshold = 225; // Vùng đệm
+          }
+          
+          return r > threshold && g > threshold && b > threshold;
         };
 
-        // Đẩy các điểm viền xung quanh ảnh vào hàng đợi
+        // Đẩy TẤT CẢ các điểm sát biên ảnh vào hàng đợi làm điểm mồi (seeds)
+        // Vì biên ngoài cùng chắc chắn là nền (không chạm nhân vật)
+        // Việc này đảm bảo ta sẽ xóa sạch 100% vệt xám ở các cạnh/góc vignette
         for (let x = 0; x < w; x++) {
-          if (isBg(x, 0)) { queue.push(x, 0); visited[0 * w + x] = 1; }
-          if (isBg(x, h - 1)) { queue.push(x, h - 1); visited[(h - 1) * w + x] = 1; }
+          queue.push(x, 0); visited[0 * w + x] = 1;
+          queue.push(x, h - 1); visited[(h - 1) * w + x] = 1;
         }
         for (let y = 0; y < h; y++) {
-          if (isBg(0, y)) { queue.push(0, y); visited[y * w + 0] = 1; }
-          if (isBg(w - 1, y)) { queue.push(w - 1, y); visited[y * w + (w - 1)] = 1; }
+          queue.push(0, y); visited[y * w + 0] = 1;
+          queue.push(w - 1, y); visited[y * w + (w - 1)] = 1;
         }
 
         // Loang BFS tìm toàn bộ vùng nền trống liên kết bên ngoài
@@ -285,7 +302,7 @@ export default function MascotRenderer({
           for (let x = 0; x < w; x++) {
             const vidx = y * w + x;
             const idx = vidx * 4;
-            
+
             if (visited[vidx] === 1) {
               data[idx + 3] = 0; // Nền trong suốt
             } else {
@@ -397,13 +414,13 @@ export default function MascotRenderer({
 
   return (
     <div className={`relative flex items-center justify-center ${currentSize.container} select-none`}>
-      
+
       {/* 1. Cánh thiên thần (Vẽ đằng sau lưng linh vật) */}
       {hasWings && (
         <motion.div
-          animate={{ 
+          animate={{
             scale: hasWings ? [0.95, 1.05, 0.95] : 1,
-            y: [0, -3, 0] 
+            y: [0, -3, 0]
           }}
           transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
           className="absolute z-0 pointer-events-none text-sky-400/90"
@@ -419,9 +436,9 @@ export default function MascotRenderer({
       {/* 2. Cánh Dơi Ác Ma (Vẽ đằng sau lưng linh vật) */}
       {hasBatWings && (
         <motion.div
-          animate={{ 
+          animate={{
             scale: [0.95, 1.05, 0.95],
-            y: [0, -3, 0] 
+            y: [0, -3, 0]
           }}
           transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
           className="absolute z-0 pointer-events-none"
@@ -437,7 +454,7 @@ export default function MascotRenderer({
       {/* 3. Bạn Rồng Con Đồng Hành (Bay bên trái) */}
       {hasDragon && (
         <motion.div
-          animate={{ 
+          animate={{
             y: [4, -8, 4],
             x: [-12, -18, -12],
             rotate: [0, 5, -5, 0]
@@ -457,7 +474,7 @@ export default function MascotRenderer({
       {/* 4. Bóng Bay Cầu Vồng (Bay bên phải) */}
       {hasBalloon && (
         <motion.div
-          animate={{ 
+          animate={{
             y: [-4, 6, -4],
             x: [12, 16, 12],
           }}
@@ -483,9 +500,9 @@ export default function MascotRenderer({
         <div className={`absolute inset-1 rounded-full bg-gradient-to-tr ${baseInfo.color} opacity-20 border-2 border-slate-800/40 z-0`} />
 
         {/* Đồ họa linh vật 3D đã tách nền kèm màu lông động */}
-        <img 
-          src={processedSrc} 
-          alt={baseInfo.name} 
+        <img
+          src={processedSrc}
+          alt={baseInfo.name}
           style={{ filter: colorFilter }}
           className="w-[85%] h-[85%] object-contain z-10 filter drop-shadow-sm select-none"
         />
@@ -494,7 +511,7 @@ export default function MascotRenderer({
 
         {/* 8. Vương miện hoàng gia (Vẽ trên đầu) */}
         {hasCrown && (
-          <motion.div 
+          <motion.div
             className="absolute z-20 pointer-events-none"
             style={{
               fontSize: size === 'sm' ? '1rem' : size === 'md' ? '1.7rem' : '2.5rem',
@@ -510,7 +527,7 @@ export default function MascotRenderer({
 
         {/* 9. Mũ Trạng Nguyên (Vẽ trên đầu) */}
         {hasGraduateHat && (
-          <motion.div 
+          <motion.div
             className="absolute z-20 pointer-events-none"
             style={{
               fontSize: size === 'sm' ? '1.1rem' : size === 'md' ? '1.8rem' : '2.6rem',
@@ -526,7 +543,7 @@ export default function MascotRenderer({
 
         {/* 10. Kính siêu ngầu (Vẽ đè lên mắt) */}
         {hasGlasses && (
-          <div 
+          <div
             className="absolute z-25 pointer-events-none"
             style={{
               fontSize: size === 'sm' ? '0.9rem' : size === 'md' ? '1.5rem' : '2.2rem',
@@ -541,7 +558,7 @@ export default function MascotRenderer({
 
         {/* 11. Mặt Nạ Bí Ẩn (Vẽ đè lên mặt) */}
         {hasMask && (
-          <div 
+          <div
             className="absolute z-25 pointer-events-none"
             style={{
               fontSize: size === 'sm' ? '0.8rem' : size === 'md' ? '1.3rem' : '2rem',
@@ -556,7 +573,7 @@ export default function MascotRenderer({
 
         {/* 12. Kiếm thần kỳ (Cầm bên tay phải / góc dưới phải) */}
         {hasSword && (
-          <motion.div 
+          <motion.div
             className="absolute z-20 pointer-events-none"
             style={{
               fontSize: size === 'sm' ? '1rem' : size === 'md' ? '1.7rem' : '2.4rem',
@@ -573,7 +590,7 @@ export default function MascotRenderer({
 
         {/* 13. Khiên Ánh Sáng (Cầm bên tay trái / góc dưới trái) */}
         {hasShield && (
-          <motion.div 
+          <motion.div
             className="absolute z-20 pointer-events-none"
             style={{
               fontSize: size === 'sm' ? '0.9rem' : size === 'md' ? '1.5rem' : '2.2rem',
