@@ -417,39 +417,170 @@ export default function MascotRenderer({
     <div className={`relative flex items-center justify-center ${currentSize.container} select-none`}>
 
       {/* 1. Cánh thiên thần (Vẽ đằng sau lưng linh vật) */}
+      {/* 1. Cánh Thiên Thần (2 cánh 2 bên cân đối) */}
       {hasWings && (
-        <motion.div
-          animate={{
-            scale: hasWings ? [0.95, 1.05, 0.95] : 1,
-            y: [0, -3, 0]
-          }}
-          transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-          className="absolute z-0 pointer-events-none text-sky-400/90"
-          style={{
-            fontSize: size === 'sm' ? '1.5rem' : size === 'md' ? '2.5rem' : '4rem',
-            top: size === 'sm' ? '5%' : size === 'md' ? '10%' : '15%',
-          }}
-        >
-          🪽
-        </motion.div>
+        <div className="absolute inset-0 z-0 pointer-events-none flex items-center justify-between">
+          {/* Cánh trái */}
+          <motion.div
+            className="absolute"
+            style={{
+              width: size === 'sm' ? '30px' : size === 'md' ? '60px' : '100px',
+              height: size === 'sm' ? '30px' : size === 'md' ? '60px' : '100px',
+              left: size === 'sm' ? '-16px' : size === 'md' ? '-32px' : '-56px',
+              top: '25%',
+              transformOrigin: '85% 50%',
+            }}
+            animate={{
+              rotate: [-15, 0, -15],
+              y: [0, -4, 0]
+            }}
+            transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
+          >
+            <svg viewBox="0 0 100 100" width="100%" height="100%">
+              <defs>
+                <linearGradient id="angelGradLeft" x1="1" y1="0.5" x2="0" y2="0.5">
+                  <stop offset="0%" stopColor="#fff9c4" />
+                  <stop offset="50%" stopColor="#ffffff" />
+                  <stop offset="100%" stopColor="#b2ebf2" />
+                </linearGradient>
+                <filter id="angelGlow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="3" result="blur" />
+                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+              </defs>
+              <path
+                d="M 85 50 C 70 30, 40 15, 10 20 C 15 38, 25 48, 35 52 C 24 56, 14 62, 18 72 C 30 72, 40 66, 46 60 C 35 72, 28 82, 32 87 C 45 82, 55 72, 60 62 C 70 66, 82 58, 85 50 Z"
+                fill="url(#angelGradLeft)"
+                stroke="#80deea"
+                strokeWidth="2.5"
+                filter="url(#angelGlow)"
+              />
+              <path d="M 65 45 C 55 35, 40 32, 25 32" fill="none" stroke="#e0f7fa" strokeWidth="2.5" strokeLinecap="round" />
+              <path d="M 58 50 C 50 43, 38 42, 28 44" fill="none" stroke="#e0f7fa" strokeWidth="2" strokeLinecap="round" />
+              <path d="M 52 56 C 45 52, 38 52, 32 54" fill="none" stroke="#e0f7fa" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+          </motion.div>
+
+          {/* Cánh phải */}
+          <motion.div
+            className="absolute"
+            style={{
+              width: size === 'sm' ? '30px' : size === 'md' ? '60px' : '100px',
+              height: size === 'sm' ? '30px' : size === 'md' ? '60px' : '100px',
+              right: size === 'sm' ? '-16px' : size === 'md' ? '-32px' : '-56px',
+              top: '25%',
+              transformOrigin: '15% 50%',
+            }}
+            animate={{
+              rotate: [15, 0, 15],
+              y: [0, -4, 0]
+            }}
+            transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
+          >
+            <svg viewBox="0 0 100 100" width="100%" height="100%" style={{ transform: 'scaleX(-1)' }}>
+              <defs>
+                <linearGradient id="angelGradRight" x1="1" y1="0.5" x2="0" y2="0.5">
+                  <stop offset="0%" stopColor="#fff9c4" />
+                  <stop offset="50%" stopColor="#ffffff" />
+                  <stop offset="100%" stopColor="#b2ebf2" />
+                </linearGradient>
+              </defs>
+              <path
+                d="M 85 50 C 70 30, 40 15, 10 20 C 15 38, 25 48, 35 52 C 24 56, 14 62, 18 72 C 30 72, 40 66, 46 60 C 35 72, 28 82, 32 87 C 45 82, 55 72, 60 62 C 70 66, 82 58, 85 50 Z"
+                fill="url(#angelGradRight)"
+                stroke="#80deea"
+                strokeWidth="2.5"
+                filter="url(#angelGlow)"
+              />
+              <path d="M 65 45 C 55 35, 40 32, 25 32" fill="none" stroke="#e0f7fa" strokeWidth="2.5" strokeLinecap="round" />
+              <path d="M 58 50 C 50 43, 38 42, 28 44" fill="none" stroke="#e0f7fa" strokeWidth="2" strokeLinecap="round" />
+              <path d="M 52 56 C 45 52, 38 52, 32 54" fill="none" stroke="#e0f7fa" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+          </motion.div>
+        </div>
       )}
 
-      {/* 2. Cánh Dơi Ác Ma (Vẽ đằng sau lưng linh vật) */}
+      {/* 2. Cánh Dơi Ác Ma (2 cánh 2 bên cân đối) */}
       {hasBatWings && (
-        <motion.div
-          animate={{
-            scale: [0.95, 1.05, 0.95],
-            y: [0, -3, 0]
-          }}
-          transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
-          className="absolute z-0 pointer-events-none"
-          style={{
-            fontSize: size === 'sm' ? '1.5rem' : size === 'md' ? '2.5rem' : '4rem',
-            top: size === 'sm' ? '5%' : size === 'md' ? '10%' : '15%',
-          }}
-        >
-          🦇
-        </motion.div>
+        <div className="absolute inset-0 z-0 pointer-events-none flex items-center justify-between">
+          {/* Cánh trái */}
+          <motion.div
+            className="absolute"
+            style={{
+              width: size === 'sm' ? '30px' : size === 'md' ? '60px' : '100px',
+              height: size === 'sm' ? '30px' : size === 'md' ? '60px' : '100px',
+              left: size === 'sm' ? '-16px' : size === 'md' ? '-32px' : '-56px',
+              top: '25%',
+              transformOrigin: '85% 50%',
+            }}
+            animate={{
+              rotate: [-15, 5, -15],
+              y: [0, -4, 0]
+            }}
+            transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+          >
+            <svg viewBox="0 0 100 100" width="100%" height="100%">
+              <defs>
+                <linearGradient id="batGradLeft" x1="1" y1="0.5" x2="0" y2="0.5">
+                  <stop offset="0%" stopColor="#4a148c" />
+                  <stop offset="50%" stopColor="#311b92" />
+                  <stop offset="100%" stopColor="#1a237e" />
+                </linearGradient>
+                <filter id="batGlow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="2" result="blur" />
+                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+              </defs>
+              <path
+                d="M 85 50 C 70 32, 45 18, 10 25 C 16 43, 24 53, 22 58 C 34 58, 44 63, 44 75 C 56 68, 70 58, 85 50 Z"
+                fill="url(#batGradLeft)"
+                stroke="#e040fb"
+                strokeWidth="2.5"
+                filter="url(#batGlow)"
+              />
+              <path d="M 85 50 L 10 25" fill="none" stroke="#e040fb" strokeWidth="2.5" strokeLinecap="round" />
+              <path d="M 85 50 L 22 58" fill="none" stroke="#e040fb" strokeWidth="2" strokeLinecap="round" />
+              <path d="M 85 50 L 44 75" fill="none" stroke="#e040fb" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </motion.div>
+
+          {/* Cánh phải */}
+          <motion.div
+            className="absolute"
+            style={{
+              width: size === 'sm' ? '30px' : size === 'md' ? '60px' : '100px',
+              height: size === 'sm' ? '30px' : size === 'md' ? '60px' : '100px',
+              right: size === 'sm' ? '-16px' : size === 'md' ? '-32px' : '-56px',
+              top: '25%',
+              transformOrigin: '15% 50%',
+            }}
+            animate={{
+              rotate: [15, -5, 15],
+              y: [0, -4, 0]
+            }}
+            transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+          >
+            <svg viewBox="0 0 100 100" width="100%" height="100%" style={{ transform: 'scaleX(-1)' }}>
+              <defs>
+                <linearGradient id="batGradRight" x1="1" y1="0.5" x2="0" y2="0.5">
+                  <stop offset="0%" stopColor="#4a148c" />
+                  <stop offset="50%" stopColor="#311b92" />
+                  <stop offset="100%" stopColor="#1a237e" />
+                </linearGradient>
+              </defs>
+              <path
+                d="M 85 50 C 70 32, 45 18, 10 25 C 16 43, 24 53, 22 58 C 34 58, 44 63, 44 75 C 56 68, 70 58, 85 50 Z"
+                fill="url(#batGradRight)"
+                stroke="#e040fb"
+                strokeWidth="2.5"
+                filter="url(#batGlow)"
+              />
+              <path d="M 85 50 L 10 25" fill="none" stroke="#e040fb" strokeWidth="2.5" strokeLinecap="round" />
+              <path d="M 85 50 L 22 58" fill="none" stroke="#e040fb" strokeWidth="2" strokeLinecap="round" />
+              <path d="M 85 50 L 44 75" fill="none" stroke="#e040fb" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </motion.div>
+        </div>
       )}
 
       {/* 3. Bạn Rồng Con Đồng Hành (Bay bên trái) */}
