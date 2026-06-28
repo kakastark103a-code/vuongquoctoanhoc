@@ -26,16 +26,16 @@ let currentBgmTrack = 'track1';
 
 export const BGM_TRACKS = {
   track1: {
-    name: 'Vương Quốc Vui Vẻ 🏰',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
+    name: 'Giai Điệu Tập Trung 🧠',
+    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3'
   },
   track2: {
-    name: 'Đường Đua Toán Học 🏎️',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'
+    name: 'Guitar Thư Giãn 🎸',
+    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-12.mp3'
   },
   track3: {
-    name: 'Giấc Mơ Ngôi Sao 🌟',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3'
+    name: 'Trí Tuệ Khai Sáng 🌌',
+    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3'
   }
 };
 
