@@ -258,13 +258,15 @@ export default function GameScreen({ subject, name, mascot, equippedSkins, onFin
         {/* Linh vật và khung thoại */}
         <div className="flex items-center gap-2.5 flex-1 max-w-[70%]">
           {/* Avatar của Linh vật */}
-          <div className="w-13 h-13 bg-indigo-50 border-2 border-slate-800 rounded-full flex items-center justify-center overflow-visible relative flex-shrink-0">
-            <MascotRenderer 
-              mascot={mascot} 
-              equippedSkins={equippedSkins} 
-              size="sm" 
-              status={mascotStatus} 
-            />
+          <div className="w-13 h-13 bg-indigo-50 border-2 border-slate-800 rounded-full flex items-center justify-center overflow-hidden relative flex-shrink-0">
+            <div className="transform scale-[1.4] mt-1">
+              <MascotRenderer 
+                mascot={mascot} 
+                equippedSkins={equippedSkins} 
+                size="sm" 
+                status={mascotStatus} 
+              />
+            </div>
           </div>
           
           {/* Bong bóng hội thoại của Linh vật */}

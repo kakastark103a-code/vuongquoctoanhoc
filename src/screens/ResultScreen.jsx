@@ -148,13 +148,15 @@ export default function ResultScreen({ score, earnedStars, name, mascot, equippe
         >
           <div className="absolute -top-3 left-10 w-4 h-4 bg-white border-t-3 border-l-3 border-slate-800 rotate-45"></div>
           
-          <div className="flex-shrink-0 w-12 h-12 bg-sky-50 border border-slate-800 rounded-full flex items-center justify-center overflow-visible relative">
-            <MascotRenderer 
-              mascot={mascot} 
-              equippedSkins={equippedSkins} 
-              size="sm" 
-              status={score >= 5 ? 'happy' : 'sad'} 
-            />
+          <div className="flex-shrink-0 w-12 h-12 bg-sky-50 border border-slate-800 rounded-full flex items-center justify-center overflow-hidden relative">
+            <div className="transform scale-[1.4] mt-1">
+              <MascotRenderer 
+                mascot={mascot} 
+                equippedSkins={equippedSkins} 
+                size="sm" 
+                status={score >= 5 ? 'happy' : 'sad'} 
+              />
+            </div>
           </div>
 
           <div className="text-left flex-1">
