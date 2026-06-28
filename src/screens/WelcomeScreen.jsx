@@ -124,7 +124,7 @@ export default function WelcomeScreen({ onSubmit }) {
                   />
                   
                   <span className={`text-[10px] font-black text-center mt-2.5 leading-tight ${isSelected ? 'text-slate-800' : 'text-slate-500'}`}>
-                    {mascotItem.name.split(" ")[0]} {/* Chỉ lấy tên ngắn */}
+                    {mascotItem.name.includes("Sư Tử") ? "Sư Tử" : mascotItem.name.split(" ")[0]}
                   </span>
                 </motion.button>
               );
