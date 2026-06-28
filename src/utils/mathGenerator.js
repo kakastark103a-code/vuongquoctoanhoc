@@ -263,11 +263,11 @@ const generateGeometryQuestion = () => {
 };
 
 /**
- * Tạo câu hỏi quy đổi đơn vị đo (độ dài, khối lượng)
+ * Tạo câu hỏi quy đổi đơn vị đo (độ dài, khối lượng, diện tích, thể tích, thời gian, hỗn hợp)
  */
 const generateConversionQuestion = () => {
-  const types = ['length', 'mass'];
-  const chosenType = types[getRandomInt(0, 1)];
+  const types = ['length', 'mass', 'area', 'volume', 'time', 'mixed'];
+  const chosenType = types[getRandomInt(0, types.length - 1)];
 
   if (chosenType === 'length') {
     const conversions = [
@@ -297,7 +297,7 @@ const generateConversionQuestion = () => {
       correctAnswer,
       options: generateOptions(correctAnswer, 1, correctAnswer * 5)
     };
-  } else {
+  } else if (chosenType === 'mass') {
     const conversions = [
       { from: 'tấn', to: 'tạ', factor: 10, op: 'multiply' },
       { from: 'tấn', to: 'kg', factor: 1000, op: 'multiply' },
@@ -323,6 +323,103 @@ const generateConversionQuestion = () => {
       questionSubText: `Bé hãy điền số thích hợp vào chỗ trống: ${val} ${conv.from} = ... ${conv.to}`,
       correctAnswer,
       options: generateOptions(correctAnswer, 1, correctAnswer * 5)
+    };
+  } else if (chosenType === 'area') {
+    const conversions = [
+      { from: 'm²', to: 'dm²', factor: 100, op: 'multiply' },
+      { from: 'dm²', to: 'cm²', factor: 100, op: 'multiply' },
+      { from: 'cm²', to: 'mm²', factor: 100, op: 'multiply' },
+      { from: 'm²', to: 'cm²', factor: 10000, op: 'multiply' },
+      { from: 'dm²', to: 'm²', factor: 100, op: 'divide' },
+      { from: 'cm²', to: 'dm²', factor: 100, op: 'divide' }
+    ];
+    const conv = conversions[getRandomInt(0, conversions.length - 1)];
+    let val, correctAnswer;
+    if (conv.op === 'multiply') {
+      val = getRandomInt(1, 8);
+      correctAnswer = val * conv.factor;
+    } else {
+      val = getRandomInt(1, 8) * conv.factor;
+      correctAnswer = val / conv.factor;
+    }
+
+    return {
+      type: 'conversion',
+      questionText: `Đổi Đơn Vị Diện Tích`,
+      questionSubText: `Bé hãy điền số thích hợp (chú ý: đơn vị diện tích hơn kém nhau 100 lần): ${val} ${conv.from} = ... ${conv.to}`,
+      correctAnswer,
+      options: generateOptions(correctAnswer, 1, correctAnswer * 5)
+    };
+  } else if (chosenType === 'volume') {
+    const conversions = [
+      { from: 'm³', to: 'dm³', factor: 1000, op: 'multiply' },
+      { from: 'dm³', to: 'cm³', factor: 1000, op: 'multiply' },
+      { from: 'm³', to: 'lít', factor: 1000, op: 'multiply' },
+      { from: 'dm³', to: 'lít', factor: 1, op: 'multiply' },
+      { from: 'lít', to: 'cm³', factor: 1000, op: 'multiply' },
+      { from: 'dm³', to: 'm³', factor: 1000, op: 'divide' }
+    ];
+    const conv = conversions[getRandomInt(0, conversions.length - 1)];
+    let val, correctAnswer;
+    if (conv.op === 'multiply') {
+      val = getRandomInt(1, 6);
+      correctAnswer = val * conv.factor;
+    } else {
+      val = getRandomInt(1, 6) * conv.factor;
+      correctAnswer = val / conv.factor;
+    }
+
+    return {
+      type: 'conversion',
+      questionText: `Đổi Đơn Vị Thể Tích`,
+      questionSubText: `Bé hãy điền số thích hợp (chú ý: 1 dm³ = 1 lít): ${val} ${conv.from} = ... ${conv.to}`,
+      correctAnswer,
+      options: generateOptions(correctAnswer, 1, correctAnswer * 5)
+    };
+  } else if (chosenType === 'time') {
+    const timeQuestions = [
+      { q: '1 giờ 15 phút = ... phút', ans: 75 },
+      { q: '1 giờ 30 phút = ... phút', ans: 90 },
+      { q: '2 giờ = ... phút', ans: 120 },
+      { q: '2 phút 30 giây = ... giây', ans: 150 },
+      { q: '3 phút = ... giây', ans: 180 },
+      { q: '2 ngày = ... giờ', ans: 48 },
+      { q: '3 ngày = ... giờ', ans: 72 },
+      { q: '2 thế kỷ = ... năm', ans: 200 },
+      { q: '5 thế kỷ = ... năm', ans: 500 },
+      { q: '1 năm 6 tháng = ... tháng', ans: 18 }
+    ];
+    const item = timeQuestions[getRandomInt(0, timeQuestions.length - 1)];
+    const correctAnswer = item.ans;
+
+    return {
+      type: 'conversion',
+      questionText: `Đồng Hồ Kỳ Diệu`,
+      questionSubText: `Bé hãy đổi đơn vị thời gian sau: ${item.q}`,
+      correctAnswer,
+      options: generateOptions(correctAnswer, 1, correctAnswer * 3)
+    };
+  } else {
+    // Thử thách "Cân bằng" (Hỗn hợp)
+    const mixedConversions = [
+      { q: '2 tấn 5 tạ = ... kg', ans: 2500 },
+      { q: '1 tấn 200 kg = ... kg', ans: 1200 },
+      { q: '3 tạ 50 kg = ... kg', ans: 350 },
+      { q: '3m 4cm = ... cm', ans: 304 },
+      { q: '5m 2dm = ... dm', ans: 52 },
+      { q: '2dm 5mm = ... mm', ans: 205 },
+      { q: '4 kg 200 g = ... g', ans: 4200 },
+      { q: '1 kg 50g = ... g', ans: 1050 }
+    ];
+    const item = mixedConversions[getRandomInt(0, mixedConversions.length - 1)];
+    const correctAnswer = item.ans;
+
+    return {
+      type: 'conversion',
+      questionText: `Thử Thách Cân Bằng`,
+      questionSubText: `Bé hãy quy đổi và gộp đơn vị đo sau: ${item.q}`,
+      correctAnswer,
+      options: generateOptions(correctAnswer, 1, correctAnswer * 3)
     };
   }
 };

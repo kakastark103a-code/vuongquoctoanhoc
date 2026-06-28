@@ -9,7 +9,11 @@ export default function ReferenceScreen({ onClose }) {
   
   // Custom converter state
   const [convVal, setConvVal] = useState('1');
-  const [convType, setConvType] = useState('length'); // 'length' | 'mass'
+  const [convType, setConvType] = useState('length'); // 'length' | 'mass' | 'area' | 'volume' | 'time'
+
+  // Time converter states
+  const [hoursVal, setHoursVal] = useState('1');
+  const [minutesVal, setMinutesVal] = useState('15');
 
   const handleBack = () => {
     playSound('click');
@@ -49,8 +53,33 @@ export default function ReferenceScreen({ onClose }) {
     };
   };
 
+  const getAreaConversion = (val) => {
+    const num = parseFloat(val) || 0;
+    return {
+      m2: num,
+      dm2: num * 100,
+      cm2: num * 10000,
+      mm2: num * 1000000,
+      km2: num / 1000000,
+    };
+  };
+
+  const getVolumeConversion = (val) => {
+    const num = parseFloat(val) || 0;
+    return {
+      m3: num,
+      dm3: num * 1000,
+      lit: num * 1000, // 1 dm3 = 1 lit
+      cm3: num * 1000000,
+    };
+  };
+
   const lenResult = getLengthConversion(convVal);
   const massResult = getMassConversion(convVal);
+  const areaResult = getAreaConversion(convVal);
+  const volResult = getVolumeConversion(convVal);
+
+  const totalMinutes = (parseInt(hoursVal) || 0) * 60 + (parseInt(minutesVal) || 0);
 
   return (
     <div className="flex-1 flex flex-col px-5 py-5 overflow-y-auto bg-gradient-to-b from-indigo-100 via-sky-100 to-emerald-50 select-none">
@@ -199,26 +228,29 @@ export default function ReferenceScreen({ onClose }) {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="flex flex-col gap-4"
+              className="flex flex-col gap-4 text-left"
             >
-              {/* Chuyển loại quy đổi */}
-              <div className="flex gap-2 bg-emerald-50 border-3 border-slate-800 p-1 rounded-2xl shadow-inner">
-                <button
-                  onClick={() => { playSound('click'); setConvType('length'); }}
-                  className={`flex-1 py-2 text-[10px] font-black rounded-xl transition-all ${
-                    convType === 'length' ? 'bg-emerald-600 text-white shadow-sm' : 'text-emerald-800'
-                  }`}
-                >
-                  Độ Dài 📏
-                </button>
-                <button
-                  onClick={() => { playSound('click'); setConvType('mass'); }}
-                  className={`flex-1 py-2 text-[10px] font-black rounded-xl transition-all ${
-                    convType === 'mass' ? 'bg-emerald-600 text-white shadow-sm' : 'text-emerald-800'
-                  }`}
-                >
-                  Khối Lượng ⚖️
-                </button>
+              {/* Chuyển loại quy đổi - Hỗ trợ cả 5 nhóm đo lường */}
+              <div className="flex flex-wrap gap-1.5 bg-emerald-50 border-3 border-slate-800 p-1.5 rounded-2xl shadow-inner justify-center">
+                {[
+                  { id: 'length', label: 'Độ Dài 📏' },
+                  { id: 'mass', label: 'Khối Lượng ⚖️' },
+                  { id: 'area', label: 'Diện Tích 🟩' },
+                  { id: 'volume', label: 'Thể Tích 📦' },
+                  { id: 'time', label: 'Thời Gian ⏰' },
+                ].map(opt => (
+                  <button
+                    key={opt.id}
+                    onClick={() => { playSound('click'); setConvType(opt.id); }}
+                    className={`px-3 py-1.5 text-[9px] font-black rounded-lg transition-all border ${
+                      convType === opt.id 
+                        ? 'bg-emerald-600 text-white border-emerald-800 shadow-sm' 
+                        : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
               </div>
 
               {/* Bảng đơn vị đo */}
@@ -227,98 +259,217 @@ export default function ReferenceScreen({ onClose }) {
                   Bảng Đơn Vị Sắp Xếp Từ Lớn Đến Bé
                 </h3>
                 
-                {convType === 'length' ? (
+                {convType === 'length' && (
                   <div>
                     {/* Thước kẻ mô tả */}
-                    <div className="flex justify-between items-center bg-teal-50 border border-teal-200 p-2.5 rounded-xl gap-1 text-[10px] font-black text-teal-800 select-none overflow-x-auto">
+                    <div className="flex justify-between items-center bg-teal-50 border border-teal-200 p-2.5 rounded-xl gap-1 text-[9px] font-black text-teal-800 select-none overflow-x-auto">
                       <span>km</span> ➡️ <span>hm</span> ➡️ <span>dam</span> ➡️ <span className="bg-teal-200/70 px-1.5 py-0.5 rounded text-teal-900">m</span> ➡️ <span>dm</span> ➡️ <span>cm</span> ➡️ <span>mm</span>
                     </div>
                     <p className="text-[9px] font-bold text-slate-400 mt-2 text-center">
                       * Hai đơn vị đo độ dài liền kề hơn (kém) nhau 10 lần
                     </p>
                   </div>
-                ) : (
+                )}
+
+                {convType === 'mass' && (
                   <div>
                     {/* Hộp cân nặng mô tả */}
-                    <div className="flex justify-between items-center bg-orange-50 border border-orange-200 p-2.5 rounded-xl gap-1 text-[10px] font-black text-orange-800 select-none overflow-x-auto">
-                      <span>Tấn</span> ➡️ <span>Tạ</span> ➡️ <span>Yến</span> ➡️ <span className="bg-orange-200/70 px-1.5 py-0.5 rounded text-orange-900">kg</span> ➡️ <span>hg</span> ➡️ <span>dag</span> ➡️ <span>g</span>
+                    <div className="flex justify-between items-center bg-orange-50 border border-orange-200 p-2.5 rounded-xl gap-1 text-[9px] font-black text-orange-800 select-none overflow-x-auto">
+                      <span>Tấn</span> ➡️ <span>Tạ</span> ➡️ <span>Yến</span> ➡️ <span className="bg-orange-200/70 px-1.5 py-0.5 rounded text-orange-900">kg</span> ➡️ <span>hg</span> ➡️ <span>indigo</span> ➡️ <span>g</span>
                     </div>
                     <p className="text-[9px] font-bold text-slate-400 mt-2 text-center">
                       * Hai đơn vị đo khối lượng liền kề hơn (kém) nhau 10 lần
                     </p>
                   </div>
                 )}
+
+                {convType === 'area' && (
+                  <div>
+                    {/* Bảng diện tích mô tả */}
+                    <div className="flex justify-between items-center bg-emerald-50 border border-emerald-200 p-2.5 rounded-xl gap-1 text-[9px] font-black text-emerald-800 select-none overflow-x-auto">
+                      <span>km²</span> ➡️ <span>hm²</span> ➡️ <span>dam²</span> ➡️ <span className="bg-emerald-200/70 px-1.5 py-0.5 rounded text-emerald-900">m²</span> ➡️ <span>dm²</span> ➡️ <span>cm²</span> ➡️ <span>mm²</span>
+                    </div>
+                    <p className="text-[9px] font-bold text-slate-400 mt-2 text-center">
+                      * Hai đơn vị đo diện tích liền kề hơn (kém) nhau 100 lần
+                    </p>
+                  </div>
+                )}
+
+                {convType === 'volume' && (
+                  <div>
+                    {/* Bảng thể tích mô tả */}
+                    <div className="flex justify-between items-center bg-sky-50 border border-sky-200 p-2.5 rounded-xl gap-3 text-[9px] font-black text-sky-800 select-none justify-center">
+                      <span>m³</span> ➡️ <span>dm³ (Lít)</span> ➡️ <span>cm³</span>
+                    </div>
+                    <div className="bg-indigo-50 border border-indigo-200 p-2 rounded-xl mt-2 text-[9px] font-black text-indigo-800 text-center">
+                      💡 Hai đơn vị thể tích liền kề hơn (kém) nhau 1000 lần.<br/>
+                      🌟 Đặc biệt: <strong>1 dm³ = 1 Lít nước</strong>
+                    </div>
+                  </div>
+                )}
+
+                {convType === 'time' && (
+                  <div className="grid grid-cols-2 gap-2 text-[9px] font-black text-slate-700 bg-amber-50/50 p-2.5 rounded-xl border border-amber-200">
+                    <div>⏱️ 1 thế kỷ = 100 năm</div>
+                    <div>📅 1 năm = 12 tháng</div>
+                    <div>🗓️ 1 tuần = 7 ngày</div>
+                    <div>☀️ 1 ngày = 24 giờ</div>
+                    <div>⏰ 1 giờ = 60 phút</div>
+                    <div>⏳ 1 phút = 60 giây</div>
+                  </div>
+                )}
               </div>
 
               {/* Trình đổi thử tương tác */}
               <div className="bg-emerald-50 border-3 border-slate-800 rounded-3xl p-4 shadow-sm">
-                <span className="text-[9px] font-black uppercase text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-200">
-                  Bé Đổi Thử Xem Nào
-                </span>
-
-                <div className="flex items-center gap-2.5 mt-3">
-                  <div className="flex-1">
-                    <label className="block text-[10px] font-bold text-slate-400 mb-1">
-                      Nhập số lượng
-                    </label>
-                    <input
-                      type="number"
-                      value={convVal}
-                      onChange={(e) => setConvVal(e.target.value)}
-                      placeholder="Số..."
-                      className="w-full bg-white border-2 border-slate-800 rounded-xl px-3 py-2 text-sm font-black focus:outline-none focus:ring-2 focus:ring-emerald-400 text-center"
-                    />
-                  </div>
-                  
-                  <div className="flex-[2] flex flex-col justify-end h-full">
-                    <span className="text-[10px] font-black text-emerald-950 mt-4 text-center">
-                      {convType === 'length' ? 'Mét (m)' : 'Kilôgam (kg)'}
+                {convType !== 'time' ? (
+                  <>
+                    <span className="text-[9px] font-black uppercase text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-200">
+                      Bé Đổi Thử Xem Nào
                     </span>
-                  </div>
-                </div>
 
-                {/* Kết quả quy đổi nhanh */}
-                <div className="grid grid-cols-2 gap-2 mt-4">
-                  {convType === 'length' ? (
-                    <>
-                      <div className="bg-white/80 border border-slate-200 p-2.5 rounded-xl text-center">
-                        <span className="text-[9px] font-bold text-slate-400">Kilômét (km)</span>
-                        <h4 className="font-black text-sm text-emerald-700 mt-0.5">{lenResult.km} km</h4>
+                    <div className="flex items-center gap-2.5 mt-3">
+                      <div className="flex-1">
+                        <label className="block text-[9px] font-bold text-slate-400 mb-1">
+                          Nhập số lượng
+                        </label>
+                        <input
+                          type="number"
+                          value={convVal}
+                          onChange={(e) => setConvVal(e.target.value)}
+                          placeholder="Số..."
+                          className="w-full bg-white border-2 border-slate-800 rounded-xl px-3 py-2 text-sm font-black focus:outline-none focus:ring-2 focus:ring-emerald-400 text-center"
+                        />
                       </div>
-                      <div className="bg-white/80 border border-slate-200 p-2.5 rounded-xl text-center">
-                        <span className="text-[9px] font-bold text-slate-400">Đềximét (dm)</span>
-                        <h4 className="font-black text-sm text-emerald-700 mt-0.5">{lenResult.dm} dm</h4>
+                      
+                      <div className="flex-[2] flex flex-col justify-end h-full">
+                        <span className="text-[10px] font-black text-emerald-950 mt-4 text-center">
+                          {convType === 'length' && 'Mét (m)'}
+                          {convType === 'mass' && 'Kilôgam (kg)'}
+                          {convType === 'area' && 'Mét vuông (m²)'}
+                          {convType === 'volume' && 'Mét khối (m³)'}
+                        </span>
                       </div>
-                      <div className="bg-white/80 border border-slate-200 p-2.5 rounded-xl text-center">
-                        <span className="text-[9px] font-bold text-slate-400">Centimét (cm)</span>
-                        <h4 className="font-black text-sm text-emerald-700 mt-0.5">{lenResult.cm} cm</h4>
+                    </div>
+
+                    {/* Kết quả quy đổi nhanh */}
+                    <div className="grid grid-cols-2 gap-2 mt-4">
+                      {convType === 'length' && (
+                        <>
+                          <div className="bg-white/80 border border-slate-200 p-2 rounded-xl text-center">
+                            <span className="text-[8px] font-bold text-slate-400">Kilômét (km)</span>
+                            <h4 className="font-black text-xs text-emerald-700 mt-0.5">{lenResult.km} km</h4>
+                          </div>
+                          <div className="bg-white/80 border border-slate-200 p-2 rounded-xl text-center">
+                            <span className="text-[8px] font-bold text-slate-400">Đềximét (dm)</span>
+                            <h4 className="font-black text-xs text-emerald-700 mt-0.5">{lenResult.dm} dm</h4>
+                          </div>
+                          <div className="bg-white/80 border border-slate-200 p-2 rounded-xl text-center">
+                            <span className="text-[8px] font-bold text-slate-400">Centimét (cm)</span>
+                            <h4 className="font-black text-xs text-emerald-700 mt-0.5">{lenResult.cm} cm</h4>
+                          </div>
+                          <div className="bg-white/80 border border-slate-200 p-2 rounded-xl text-center">
+                            <span className="text-[8px] font-bold text-slate-400">Milimét (mm)</span>
+                            <h4 className="font-black text-xs text-emerald-700 mt-0.5">{lenResult.mm} mm</h4>
+                          </div>
+                        </>
+                      )}
+
+                      {convType === 'mass' && (
+                        <>
+                          <div className="bg-white/80 border border-slate-200 p-2 rounded-xl text-center">
+                            <span className="text-[8px] font-bold text-slate-400">Tấn</span>
+                            <h4 className="font-black text-xs text-emerald-700 mt-0.5">{massResult.tan} tấn</h4>
+                          </div>
+                          <div className="bg-white/80 border border-slate-200 p-2 rounded-xl text-center">
+                            <span className="text-[8px] font-bold text-slate-400">Tạ</span>
+                            <h4 className="font-black text-xs text-emerald-700 mt-0.5">{massResult.ta} tạ</h4>
+                          </div>
+                          <div className="bg-white/80 border border-slate-200 p-2 rounded-xl text-center">
+                            <span className="text-[8px] font-bold text-slate-400">Yến</span>
+                            <h4 className="font-black text-xs text-emerald-700 mt-0.5">{massResult.yen} yến</h4>
+                          </div>
+                          <div className="bg-white/80 border border-slate-200 p-2 rounded-xl text-center">
+                            <span className="text-[8px] font-bold text-slate-400">Gam (g)</span>
+                            <h4 className="font-black text-xs text-emerald-700 mt-0.5">{massResult.g} g</h4>
+                          </div>
+                        </>
+                      )}
+
+                      {convType === 'area' && (
+                        <>
+                          <div className="bg-white/80 border border-slate-200 p-2 rounded-xl text-center col-span-2">
+                            <span className="text-[8px] font-bold text-slate-400">Kilômét vuông (km²)</span>
+                            <h4 className="font-black text-xs text-emerald-700 mt-0.5">{areaResult.km2} km²</h4>
+                          </div>
+                          <div className="bg-white/80 border border-slate-200 p-2 rounded-xl text-center">
+                            <span className="text-[8px] font-bold text-slate-400">Đềximét vuông (dm²)</span>
+                            <h4 className="font-black text-xs text-emerald-700 mt-0.5">{areaResult.dm2} dm²</h4>
+                          </div>
+                          <div className="bg-white/80 border border-slate-200 p-2 rounded-xl text-center">
+                            <span className="text-[8px] font-bold text-slate-400">Centimét vuông (cm²)</span>
+                            <h4 className="font-black text-xs text-emerald-700 mt-0.5">{areaResult.cm2} cm²</h4>
+                          </div>
+                        </>
+                      )}
+
+                      {convType === 'volume' && (
+                        <>
+                          <div className="bg-white/80 border border-slate-200 p-2 rounded-xl text-center">
+                            <span className="text-[8px] font-bold text-slate-400">Đềximét khối (dm³)</span>
+                            <h4 className="font-black text-xs text-emerald-700 mt-0.5">{volResult.dm3} dm³</h4>
+                          </div>
+                          <div className="bg-white/80 border border-slate-200 p-2 rounded-xl text-center">
+                            <span className="text-[8px] font-bold text-slate-400">Số Lít Nước (Lít)</span>
+                            <h4 className="font-black text-xs text-indigo-700 mt-0.5">{volResult.lit} lít</h4>
+                          </div>
+                          <div className="bg-white/80 border border-slate-200 p-2 rounded-xl text-center col-span-2">
+                            <span className="text-[8px] font-bold text-slate-400">Centimét khối (cm³)</span>
+                            <h4 className="font-black text-xs text-emerald-700 mt-0.5">{volResult.cm3} cm³</h4>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-[9px] font-black uppercase text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-200">
+                      ⏰ Đồng Hồ Kỳ Diệu (Đổi Thời Gian)
+                    </span>
+
+                    <div className="flex items-center gap-2 mt-3">
+                      <div className="flex-1">
+                        <label className="block text-[8px] font-bold text-slate-400 mb-0.5 text-center">Giờ</label>
+                        <input
+                          type="number"
+                          value={hoursVal}
+                          onChange={(e) => setHoursVal(e.target.value)}
+                          className="w-full bg-white border-2 border-slate-800 rounded-xl px-2 py-1.5 text-xs font-black text-center focus:outline-none"
+                        />
                       </div>
-                      <div className="bg-white/80 border border-slate-200 p-2.5 rounded-xl text-center">
-                        <span className="text-[9px] font-bold text-slate-400">Milimét (mm)</span>
-                        <h4 className="font-black text-sm text-emerald-700 mt-0.5">{lenResult.mm} mm</h4>
+                      <span className="font-black text-xs text-slate-700 mt-3">:</span>
+                      <div className="flex-1">
+                        <label className="block text-[8px] font-bold text-slate-400 mb-0.5 text-center">Phút</label>
+                        <input
+                          type="number"
+                          value={minutesVal}
+                          onChange={(e) => setMinutesVal(e.target.value)}
+                          className="w-full bg-white border-2 border-slate-800 rounded-xl px-2 py-1.5 text-xs font-black text-center focus:outline-none"
+                        />
                       </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="bg-white/80 border border-slate-200 p-2.5 rounded-xl text-center">
-                        <span className="text-[9px] font-bold text-slate-400">Tấn</span>
-                        <h4 className="font-black text-sm text-emerald-700 mt-0.5">{massResult.tan} tấn</h4>
-                      </div>
-                      <div className="bg-white/80 border border-slate-200 p-2.5 rounded-xl text-center">
-                        <span className="text-[9px] font-bold text-slate-400">Tạ</span>
-                        <h4 className="font-black text-sm text-emerald-700 mt-0.5">{massResult.ta} tạ</h4>
-                      </div>
-                      <div className="bg-white/80 border border-slate-200 p-2.5 rounded-xl text-center">
-                        <span className="text-[9px] font-bold text-slate-400">Yến</span>
-                        <h4 className="font-black text-sm text-emerald-700 mt-0.5">{massResult.yen} yến</h4>
-                      </div>
-                      <div className="bg-white/80 border border-slate-200 p-2.5 rounded-xl text-center">
-                        <span className="text-[9px] font-bold text-slate-400">Gam (g)</span>
-                        <h4 className="font-black text-sm text-emerald-700 mt-0.5">{massResult.g} g</h4>
-                      </div>
-                    </>
-                  )}
-                </div>
+                    </div>
+
+                    <div className="bg-white border-2 border-slate-800 p-3 rounded-2xl mt-4 text-center shadow-sm">
+                      <span className="text-[8px] font-bold text-slate-400 block">Quy đổi ra Phút</span>
+                      <h4 className="font-black text-sm text-indigo-700 mt-0.5">
+                        = {totalMinutes} phút
+                      </h4>
+                      <p className="text-[8px] font-bold text-slate-400 mt-0.5">
+                        ({hoursVal} giờ x 60 + {minutesVal} phút)
+                      </p>
+                    </div>
+                  </>
+                )}
               </div>
             </motion.div>
           )}
