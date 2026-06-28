@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Zap, Divide, Shapes, Award, ShoppingBag, Edit3 } from 'lucide-react';
+import { Zap, Divide, Shapes, Award, ShoppingBag, Edit3, BookOpen, Scale } from 'lucide-react';
 import MascotRenderer, { BASE_MASCOTS } from '../components/MascotRenderer';
 import { playSound } from '../utils/soundEffects';
 
@@ -11,7 +11,8 @@ export default function HomeScreen({
   onSelectSubject, 
   totalStars, 
   onGoToStore, 
-  onResetProfile 
+  onResetProfile,
+  onGoToReference
 }) {
 
   const subjects = [
@@ -27,17 +28,33 @@ export default function HomeScreen({
       id: 'division',
       title: 'Phép Chia Kỳ Thú',
       desc: 'Bảng chia từ 2 đến 9',
-      icon: <Divide className="w-8 h-8 text-emerald-950 stroke-[3]" />,
-      emoji: '🎈',
+      icon: <Divide className="w-8 h-8 text-indigo-950 stroke-[3]" />,
+      emoji: '➗',
+      btnStyle: 'btn-cartoon-blue text-sky-950',
+    },
+    {
+      id: 'conversion',
+      title: 'Quy Đổi Đo Lường',
+      desc: 'Bảng đổi Độ dài và Khối lượng',
+      icon: <Scale className="w-8 h-8 text-emerald-950 stroke-[2.5]" />,
+      emoji: '⚖️',
       btnStyle: 'btn-cartoon-green text-emerald-950',
     },
     {
       id: 'geometry',
-      title: 'Khám Phá Hình Học',
-      desc: 'Chu vi Hình vuông, Chữ nhật, Tam giác',
-      icon: <Shapes className="w-8 h-8 text-sky-950 stroke-[2.5]" />,
+      title: 'Chu Vi Hình Học',
+      desc: 'Chu vi hình vuông, chữ nhật, tam giác',
+      icon: <Shapes className="w-8 h-8 text-pink-950 stroke-[2.5]" />,
       emoji: '📐',
-      btnStyle: 'btn-cartoon-blue text-sky-950',
+      btnStyle: 'btn-cartoon-purple text-purple-950',
+    },
+    {
+      id: 'area',
+      title: 'Diện Tích Hình Học',
+      desc: 'Diện tích hình vuông và hình chữ nhật',
+      icon: <Shapes className="w-8 h-8 text-orange-950 stroke-[2.5]" />,
+      emoji: '🟦',
+      btnStyle: 'btn-cartoon-orange text-amber-950',
     },
   ];
 
@@ -181,27 +198,26 @@ export default function HomeScreen({
         </motion.div>
       </div>
 
-      {/* Nút Cửa Hàng Trang Phục */}
-      <div className="z-10 max-w-sm w-full mx-auto my-1">
+      {/* Nút Cửa Hàng & Sổ Tay Học Tập */}
+      <div className="z-10 max-w-sm w-full mx-auto my-1 grid grid-cols-2 gap-2.5">
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={handleStoreClick}
-          className="w-full flex items-center justify-between p-3.5 btn-cartoon-purple text-purple-950"
+          className="w-full flex items-center justify-center py-3.5 btn-cartoon-purple text-purple-950 text-xs font-black gap-1.5"
         >
-          <div className="flex items-center gap-3">
-            <div className="bg-white/80 border-2 border-slate-800 rounded-xl p-1.5">
-              <ShoppingBag className="w-5 h-5 text-purple-950 stroke-[3]" />
-            </div>
-            <div>
-              <h3 className="font-black text-sm tracking-wide">Cửa Hàng Trang Phục 🎒</h3>
-              <p className="text-[10px] font-bold opacity-80 mt-0.5">Làm đẹp cho bạn đồng hành {currentMascotInfo.name.split(" ")[0]}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-1.5 bg-white/70 px-3 py-1 rounded-full border border-slate-800">
-            <span className="font-extrabold text-[10px] text-amber-700">Ghé shop</span>
-            <span>✨</span>
-          </div>
+          <ShoppingBag className="w-4 h-4 stroke-[3]" />
+          Cửa Hàng 🎒
+        </motion.button>
+
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => { playSound('click'); onGoToReference(); }}
+          className="w-full flex items-center justify-center py-3.5 btn-cartoon-yellow text-amber-950 text-xs font-black gap-1.5"
+        >
+          <BookOpen className="w-4 h-4 stroke-[3]" />
+          Sổ Tay Học Tập 📖
         </motion.button>
       </div>
 

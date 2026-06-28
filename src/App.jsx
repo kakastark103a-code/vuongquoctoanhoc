@@ -6,11 +6,12 @@ import GameScreen from './screens/GameScreen';
 import ResultScreen from './screens/ResultScreen';
 import WelcomeScreen from './screens/WelcomeScreen';
 import StoreScreen from './screens/StoreScreen';
+import ReferenceScreen from './screens/ReferenceScreen';
 import { getSoundEnabled, setSoundEnabled } from './utils/soundEffects';
 
 export default function App() {
-  const [screen, setScreen] = useState('welcome'); // 'welcome' | 'home' | 'game' | 'result' | 'store'
-  const [subject, setSubject] = useState(null); // 'multiplication' | 'division' | 'geometry'
+  const [screen, setScreen] = useState('welcome'); // 'welcome' | 'home' | 'game' | 'result' | 'store' | 'reference'
+  const [subject, setSubject] = useState(null); // 'multiplication' | 'division' | 'geometry' | 'conversion' | 'area'
   
   // Thông tin người chơi & linh vật
   const [name, setName] = useState('');
@@ -207,8 +208,8 @@ export default function App() {
         {/* Notch tai thỏ giả lập trên PC */}
         <div className="hidden sm:block absolute top-0 left-1/2 transform -translate-x-1/2 w-40 h-5 bg-slate-800 rounded-b-2xl z-40"></div>
         
-        {/* Header điều hướng và điểm sao - Ẩn khi ở màn hình chào mừng hoặc Store */}
-        {screen !== 'welcome' && screen !== 'store' && (
+        {/* Header điều hướng và điểm sao - Ẩn khi ở màn hình chào mừng, Store hoặc Sổ tay */}
+        {screen !== 'welcome' && screen !== 'store' && screen !== 'reference' && (
           <Header 
             onBack={handleBack} 
             stars={stars}
@@ -252,6 +253,7 @@ export default function App() {
                   totalStars={stars}
                   onGoToStore={() => setScreen('store')}
                   onResetProfile={handleResetProfile}
+                  onGoToReference={() => setScreen('reference')}
                 />
               </motion.div>
             )}
@@ -312,6 +314,21 @@ export default function App() {
                   equippedSkins={equippedSkins}
                   onBuyItem={handleBuyItem}
                   onToggleEquip={handleToggleEquip}
+                  onClose={() => setScreen('home')}
+                />
+              </motion.div>
+            )}
+
+            {screen === 'reference' && (
+              <motion.div
+                key="reference"
+                className="flex-1 flex flex-col overflow-hidden"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.25 }}
+              >
+                <ReferenceScreen
                   onClose={() => setScreen('home')}
                 />
               </motion.div>

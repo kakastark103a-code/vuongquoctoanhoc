@@ -263,8 +263,145 @@ const generateGeometryQuestion = () => {
 };
 
 /**
+ * Tạo câu hỏi quy đổi đơn vị đo (độ dài, khối lượng)
+ */
+const generateConversionQuestion = () => {
+  const types = ['length', 'mass'];
+  const chosenType = types[getRandomInt(0, 1)];
+
+  if (chosenType === 'length') {
+    const conversions = [
+      { from: 'km', to: 'm', factor: 1000, op: 'multiply' },
+      { from: 'm', to: 'cm', factor: 100, op: 'multiply' },
+      { from: 'm', to: 'dm', factor: 10, op: 'multiply' },
+      { from: 'dm', to: 'cm', factor: 10, op: 'multiply' },
+      { from: 'cm', to: 'mm', factor: 10, op: 'multiply' },
+      { from: 'm', to: 'mm', factor: 1000, op: 'multiply' },
+      { from: 'cm', to: 'm', factor: 100, op: 'divide' },
+      { from: 'dm', to: 'm', factor: 10, op: 'divide' },
+    ];
+    const conv = conversions[getRandomInt(0, conversions.length - 1)];
+    let val, correctAnswer;
+    if (conv.op === 'multiply') {
+      val = getRandomInt(1, 10);
+      correctAnswer = val * conv.factor;
+    } else {
+      val = getRandomInt(1, 10) * conv.factor;
+      correctAnswer = val / conv.factor;
+    }
+
+    return {
+      type: 'conversion',
+      questionText: `Đổi Đơn Vị Độ Dài`,
+      questionSubText: `Bé hãy điền số thích hợp vào chỗ trống: ${val} ${conv.from} = ... ${conv.to}`,
+      correctAnswer,
+      options: generateOptions(correctAnswer, 1, correctAnswer * 5)
+    };
+  } else {
+    const conversions = [
+      { from: 'tấn', to: 'tạ', factor: 10, op: 'multiply' },
+      { from: 'tấn', to: 'kg', factor: 1000, op: 'multiply' },
+      { from: 'tạ', to: 'kg', factor: 100, op: 'multiply' },
+      { from: 'yến', to: 'kg', factor: 10, op: 'multiply' },
+      { from: 'kg', to: 'g', factor: 1000, op: 'multiply' },
+      { from: 'kg', to: 'tạ', factor: 100, op: 'divide' },
+      { from: 'kg', to: 'tấn', factor: 1000, op: 'divide' }
+    ];
+    const conv = conversions[getRandomInt(0, conversions.length - 1)];
+    let val, correctAnswer;
+    if (conv.op === 'multiply') {
+      val = getRandomInt(1, 10);
+      correctAnswer = val * conv.factor;
+    } else {
+      val = getRandomInt(1, 10) * conv.factor;
+      correctAnswer = val / conv.factor;
+    }
+
+    return {
+      type: 'conversion',
+      questionText: `Đổi Đơn Vị Khối Lượng`,
+      questionSubText: `Bé hãy điền số thích hợp vào chỗ trống: ${val} ${conv.from} = ... ${conv.to}`,
+      correctAnswer,
+      options: generateOptions(correctAnswer, 1, correctAnswer * 5)
+    };
+  }
+};
+
+/**
+ * Tạo câu hỏi tính diện tích hình vuông, hình chữ nhật
+ */
+const generateAreaQuestion = () => {
+  const chosenShape = getRandomInt(0, 1) === 0 ? 'square' : 'rectangle';
+
+  if (chosenShape === 'square') {
+    const side = getRandomInt(2, 10);
+    const correctAnswer = side * side;
+
+    const optionsSet = new Set([correctAnswer]);
+    const distractors = [
+      side * 4, // Chu vi nhầm lẫn
+      side * 2,
+      side + side,
+      correctAnswer + 5,
+      correctAnswer - 5
+    ];
+    const shuffledDistractors = shuffleArray(distractors.filter(x => x > 0 && x !== correctAnswer));
+    for (let d of shuffledDistractors) {
+      optionsSet.add(d);
+      if (optionsSet.size === 4) break;
+    }
+    while (optionsSet.size < 4) {
+      optionsSet.add(correctAnswer + getRandomInt(-4, 4));
+    }
+
+    return {
+      type: 'geometry',
+      shape: 'square',
+      isArea: true,
+      questionText: 'Tính diện tích Hình Vuông',
+      questionSubText: `Hình vuông có cạnh bằng ${side} cm. Diện tích của hình vuông này là bao nhiêu cm²?`,
+      shapeData: { side },
+      correctAnswer,
+      options: shuffleArray(Array.from(optionsSet))
+    };
+  } else {
+    const width = getRandomInt(2, 8);
+    const height = getRandomInt(width + 1, width + 5);
+    const correctAnswer = width * height;
+
+    const optionsSet = new Set([correctAnswer]);
+    const distractors = [
+      (width + height) * 2, // Chu vi nhầm lẫn
+      width + height,
+      width * 2 + height,
+      correctAnswer + 6,
+      correctAnswer - 6
+    ];
+    const shuffledDistractors = shuffleArray(distractors.filter(x => x > 0 && x !== correctAnswer));
+    for (let d of shuffledDistractors) {
+      optionsSet.add(d);
+      if (optionsSet.size === 4) break;
+    }
+    while (optionsSet.size < 4) {
+      optionsSet.add(correctAnswer + getRandomInt(-5, 5));
+    }
+
+    return {
+      type: 'geometry',
+      shape: 'rectangle',
+      isArea: true,
+      questionText: 'Tính diện tích Hình Chữ Nhật',
+      questionSubText: `Hình chữ nhật có chiều dài ${height} cm và chiều rộng ${width} cm. Diện tích là bao nhiêu cm²?`,
+      shapeData: { width, height },
+      correctAnswer,
+      options: shuffleArray(Array.from(optionsSet))
+    };
+  }
+};
+
+/**
  * Sinh danh sách 10 câu hỏi theo chủ đề được chọn
- * @param {string} subject - 'multiplication' | 'division' | 'geometry'
+ * @param {string} subject - 'multiplication' | 'division' | 'geometry' | 'conversion' | 'area'
  * @returns {Array} Mảng gồm 10 câu hỏi
  */
 export const generateQuestionSet = (subject) => {
@@ -274,6 +411,10 @@ export const generateQuestionSet = (subject) => {
       questionSet.push(generateMultiplicationQuestion());
     } else if (subject === 'division') {
       questionSet.push(generateDivisionQuestion());
+    } else if (subject === 'conversion') {
+      questionSet.push(generateConversionQuestion());
+    } else if (subject === 'area') {
+      questionSet.push(generateAreaQuestion());
     } else {
       questionSet.push(generateGeometryQuestion());
     }

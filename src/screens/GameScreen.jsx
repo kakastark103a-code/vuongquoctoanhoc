@@ -34,7 +34,13 @@ export default function GameScreen({ subject, name, mascot, equippedSkins, onFin
       const q = questions[currentIndex];
       setMascotStatus('idle');
       if (q.type === 'geometry') {
-        setMascotSpeech(`Hãy tính chu vi hình này nhé ${name}! Đọc kỹ số đo nha! 📐`);
+        if (q.isArea) {
+          setMascotSpeech(`Tính diện tích hình này nha ${name}! Công thức là gì nhỉ? 🟦`);
+        } else {
+          setMascotSpeech(`Hãy tính chu vi hình này nhé ${name}! Đọc kỹ số đo nha! 📐`);
+        }
+      } else if (q.type === 'conversion') {
+        setMascotSpeech(`Bảng quy đổi đơn vị đo đây rồi! Đổi cẩn thận nhé ${name}! ⚖️`);
       } else {
         setMascotSpeech(`Đố ${name} biết phép tính này có đáp án là gì nào? ⚡`);
       }
@@ -148,7 +154,11 @@ export default function GameScreen({ subject, name, mascot, equippedSkins, onFin
           >
             {/* Nhãn loại thử thách */}
             <div className="absolute top-2.5 right-2.5 text-[9px] bg-indigo-100 border border-indigo-300 font-extrabold text-indigo-700 px-2 py-0.5 rounded-full">
-              {subject === 'multiplication' ? '✖️ Nhân' : subject === 'division' ? '➗ Chia' : '📐 Hình Học'}
+              {subject === 'multiplication' && '✖️ Nhân'}
+              {subject === 'division' && '➗ Chia'}
+              {subject === 'conversion' && '⚖️ Quy Đổi'}
+              {subject === 'area' && '🟦 Diện Tích'}
+              {subject === 'geometry' && '📐 Chu Vi'}
             </div>
 
             <div className="text-center pt-2">
