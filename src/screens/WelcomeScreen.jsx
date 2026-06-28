@@ -148,6 +148,18 @@ export default function WelcomeScreen({ onSubmit }) {
 
       </form>
 
+      {/* Hướng dẫn cài đặt Phím tắt MH chính (PWA Guide) */}
+      <div className="z-10 bg-indigo-50/70 border border-dashed border-indigo-200 rounded-2xl p-3 text-left max-w-sm w-full mx-auto my-3">
+        <h4 className="font-black text-[10px] text-indigo-950 flex items-center gap-1.5 leading-none">
+          📲 Cài đặt ứng dụng về màn hình chính:
+        </h4>
+        <p className="text-[9px] font-bold text-slate-500 mt-1.5 leading-normal">
+          • <strong>iPhone (Safari)</strong>: Nhấp nút chia sẻ <span className="bg-white px-1 py-0.5 rounded border border-slate-300 font-extrabold text-[8px]">📤</span> ➡️ Chọn <strong>"Thêm vào MH chính"</strong>.
+          <br />
+          • <strong>Android (Chrome)</strong>: Bấm nút ba chấm <strong className="font-extrabold">⋮</strong> ở góc trên ➡️ Chọn <strong>"Thêm vào màn hình chính"</strong>.
+        </p>
+      </div>
+
       {/* Trang trí chân trang */}
       <div className="text-center text-[8px] font-extrabold text-slate-400/50 z-10 pt-4 border-t border-slate-200/50 max-w-[200px] mx-auto select-none uppercase tracking-widest">
         © 2026 TruongPhan
