@@ -167,7 +167,7 @@ export default function App() {
   const bubbles = Array.from({ length: 8 });
 
   return (
-    <div className="min-h-screen w-screen bg-slate-900 flex items-center justify-center p-0 sm:p-4 overflow-hidden relative">
+    <div className="h-screen h-[100dvh] sm:h-auto sm:min-h-screen w-screen bg-slate-900 flex items-center justify-center p-0 sm:p-4 overflow-hidden relative">
       
       {/* Môi trường trang trí bên ngoài điện thoại trên màn hình PC */}
       <div className="hidden lg:block absolute left-10 top-1/4 max-w-[220px] text-white/40 select-none pointer-events-none">
