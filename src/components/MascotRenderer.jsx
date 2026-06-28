@@ -54,10 +54,10 @@ export const SHOP_ITEMS = [
   {
     id: 'sword',
     category: 'accessory',
-    name: 'Kiếm Thần Kỳ',
-    emoji: '🗡️',
+    name: 'Cún Con Tinh Nghịch 🐶',
+    emoji: '🐶',
     cost: 25,
-    desc: 'Thanh kiếm pha lê bảo vệ chính nghĩa.'
+    desc: 'Bạn cún con siêu dễ thương chạy lon ton cổ vũ bên phải.'
   },
   {
     id: 'shield',
@@ -78,10 +78,10 @@ export const SHOP_ITEMS = [
   {
     id: 'mask',
     category: 'accessory',
-    name: 'Mặt Nạ Bí Ẩn',
-    emoji: '🎭',
+    name: 'Mèo Con May Mắn 🐱',
+    emoji: '🐱',
     cost: 18,
-    desc: 'Mặt nạ hóa trang lễ hội vui nhộn.'
+    desc: 'Mèo con dễ thương ngồi ngoan ngoãn bên trái chúc mừng bé.'
   },
   {
     id: 'crown',
@@ -688,35 +688,41 @@ export default function MascotRenderer({
           </div>
         )}
 
-        {/* 11. Mặt Nạ Bí Ẩn (Vẽ đè lên mặt) */}
+        {/* 11. Mèo Con May Mắn (Thế chỗ cho mask - Ngồi bên trái) */}
         {hasMask && (
-          <div
-            className="absolute z-25 pointer-events-none"
+          <motion.div
+            className="absolute z-20 pointer-events-none"
             style={{
-              fontSize: size === 'sm' ? '0.8rem' : size === 'md' ? '1.3rem' : '2rem',
-              top: size === 'sm' ? '22%' : size === 'md' ? '25%' : '28%',
-              left: '50%',
-              transform: 'translateX(-50%)',
+              fontSize: size === 'sm' ? '0.9rem' : size === 'md' ? '1.5rem' : '2.2rem',
+              left: size === 'sm' ? '-10px' : size === 'md' ? '-20px' : '-30px',
+              bottom: size === 'sm' ? '8px' : size === 'md' ? '14px' : '20px',
             }}
+            animate={{
+              rotate: [-5, 5, -5],
+              y: [0, -2, 0]
+            }}
+            transition={{ repeat: Infinity, duration: 2.2, ease: "easeInOut" }}
           >
-            🎭
-          </div>
+            🐱
+          </motion.div>
         )}
 
-        {/* 12. Kiếm thần kỳ (Cầm bên tay phải / góc dưới phải) */}
+        {/* 12. Cún Con Tinh Nghịch (Thế chỗ cho kiếm - Nhảy bên phải) */}
         {hasSword && (
           <motion.div
             className="absolute z-20 pointer-events-none"
             style={{
-              fontSize: size === 'sm' ? '1rem' : size === 'md' ? '1.7rem' : '2.4rem',
-              right: size === 'sm' ? '-6px' : size === 'md' ? '-12px' : '-18px',
-              bottom: size === 'sm' ? '6px' : size === 'md' ? '10px' : '15px',
-              transform: 'rotate(15deg)',
+              fontSize: size === 'sm' ? '0.9rem' : size === 'md' ? '1.5rem' : '2.2rem',
+              right: size === 'sm' ? '-10px' : size === 'md' ? '-20px' : '-30px',
+              bottom: size === 'sm' ? '8px' : size === 'md' ? '14px' : '20px',
             }}
-            animate={status === 'happy' ? { rotate: [15, 45, 15] } : {}}
-            transition={{ repeat: status === 'happy' ? 2 : 0, duration: 0.2 }}
+            animate={{
+              y: [0, -4, 0],
+              rotate: [0, 4, -4, 0]
+            }}
+            transition={{ repeat: Infinity, duration: 1.2, ease: "easeInOut" }}
           >
-            🗡️
+            🐶
           </motion.div>
         )}
 
