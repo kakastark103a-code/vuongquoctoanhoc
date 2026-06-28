@@ -257,13 +257,16 @@ export default function HomeScreen({
       </div>
 
       {/* Thành tích chân trang */}
-      <div className="text-center z-10 mt-auto pt-2">
+      <div className="text-center z-10 mt-auto pt-2 flex flex-col items-center gap-1">
         <div className="inline-flex items-center gap-1 bg-white/40 border border-slate-300 rounded-full px-4 py-1">
           <Award className="w-3.5 h-3.5 text-amber-600" />
           <span className="text-[10px] font-bold text-slate-700">
             Sao tích luỹ: <strong className="text-amber-700">{totalStars} ⭐️</strong>
           </span>
         </div>
+        <p className="text-[8px] font-extrabold text-slate-500/50 uppercase tracking-widest mt-1 select-none">
+          © 2026 TruongPhan
+        </p>
       </div>
     </div>
   );

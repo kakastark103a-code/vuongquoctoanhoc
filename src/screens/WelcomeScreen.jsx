@@ -149,8 +149,8 @@ export default function WelcomeScreen({ onSubmit }) {
       </form>
 
       {/* Trang trí chân trang */}
-      <div className="text-center text-[10px] font-bold text-slate-400 z-10 pt-4 border-t border-slate-200/50 max-w-[200px] mx-auto">
-        👑 Vương Quốc Toán Học v1.1
+      <div className="text-center text-[8px] font-extrabold text-slate-400/50 z-10 pt-4 border-t border-slate-200/50 max-w-[200px] mx-auto select-none uppercase tracking-widest">
+        © 2026 TruongPhan
       </div>
 
     </div>
