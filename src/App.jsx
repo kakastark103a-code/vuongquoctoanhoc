@@ -7,7 +7,8 @@ import ResultScreen from './screens/ResultScreen';
 import WelcomeScreen from './screens/WelcomeScreen';
 import StoreScreen from './screens/StoreScreen';
 import ReferenceScreen from './screens/ReferenceScreen';
-import { getSoundEnabled, setSoundEnabled } from './utils/soundEffects';
+import SettingsModal from './components/SettingsModal';
+import { getSoundEnabled, setSoundEnabled, playBgm, pauseBgm } from './utils/soundEffects';
 
 export default function App() {
   const [screen, setScreen] = useState('welcome'); // 'welcome' | 'home' | 'game' | 'result' | 'store' | 'reference'
@@ -20,8 +21,23 @@ export default function App() {
   const [unlockedSkins, setUnlockedSkins] = useState([]); // Array IDs
   const [equippedSkins, setEquippedSkins] = useState([]); // Array IDs
 
-  const [soundEnabled, setLocalSoundEnabled] = useState(true);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [currentScore, setCurrentScore] = useState(0);
+
+  // Phát nhạc khi bé bắt đầu tương tác với trang (Tránh block autoplay của trình duyệt)
+  useEffect(() => {
+    const startBgmOnInteraction = () => {
+      playBgm();
+      window.removeEventListener('click', startBgmOnInteraction);
+      window.removeEventListener('touchstart', startBgmOnInteraction);
+    };
+    window.addEventListener('click', startBgmOnInteraction);
+    window.addEventListener('touchstart', startBgmOnInteraction);
+    return () => {
+      window.removeEventListener('click', startBgmOnInteraction);
+      window.removeEventListener('touchstart', startBgmOnInteraction);
+    };
+  }, []);
 
   // Khôi phục tất cả thông tin từ LocalStorage khi khởi tạo
   useEffect(() => {
@@ -68,15 +84,7 @@ export default function App() {
     } else {
       setEquippedSkins([]);
     }
-
-    setLocalSoundEnabled(getSoundEnabled());
   }, []);
-
-  const handleToggleSound = () => {
-    const newState = !soundEnabled;
-    setLocalSoundEnabled(newState);
-    setSoundEnabled(newState);
-  };
 
   const handleSelectSubject = (selectedSub) => {
     setSubject(selectedSub);
@@ -123,6 +131,7 @@ export default function App() {
     }
     
     setScreen('home');
+    playBgm();
   };
 
   const handleResetProfile = () => {
@@ -131,6 +140,7 @@ export default function App() {
     localStorage.removeItem('math_kingdom_mascot');
     setName('');
     setScreen('welcome');
+    pauseBgm();
   };
 
   const handleBuyItem = (itemId, cost) => {
@@ -213,8 +223,7 @@ export default function App() {
           <Header 
             onBack={handleBack} 
             stars={stars}
-            soundEnabled={soundEnabled}
-            onToggleSound={handleToggleSound}
+            onOpenSettings={() => setShowSettingsModal(true)}
             showBackBtn={screen === 'game'}
           />
         )}
@@ -341,6 +350,13 @@ export default function App() {
         <div className="hidden sm:block h-6 bg-slate-800 w-full relative z-30">
           <div className="w-28 h-1 bg-slate-500 rounded-full mx-auto mt-2"></div>
         </div>
+
+        {/* Modal cài đặt âm thanh & nhạc nền */}
+        <AnimatePresence>
+          {showSettingsModal && (
+            <SettingsModal onClose={() => setShowSettingsModal(false)} />
+          )}
+        </AnimatePresence>
 
       </div>
     </div>

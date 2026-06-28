@@ -1,13 +1,12 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Star, Volume2, VolumeX } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ArrowLeft, Star, Settings } from 'lucide-react';
 import { playSound } from '../utils/soundEffects';
 
 export default function Header({ 
   onBack, 
   stars, 
-  soundEnabled, 
-  onToggleSound, 
+  onOpenSettings, 
   showBackBtn = false 
 }) {
 
@@ -16,17 +15,13 @@ export default function Header({
     onBack();
   };
 
-  const handleSoundClick = () => {
-    // We play sound AFTER toggling, so we check the opposite of current state
-    onToggleSound();
-    // Delay slightly to play sound with the new state
-    setTimeout(() => {
-      playSound('click');
-    }, 50);
+  const handleSettingsClick = () => {
+    playSound('click');
+    onOpenSettings();
   };
 
   return (
-    <header className="flex items-center justify-between px-4 py-3 bg-white/70 backdrop-blur-md border-b-4 border-slate-200 sticky top-0 z-30">
+    <header className="flex items-center justify-between px-4 py-3 bg-white/70 backdrop-blur-md border-b-4 border-slate-200 sticky top-0 z-30 select-none">
       {/* Nút Quay Lại */}
       <div className="w-12">
         {showBackBtn && (
@@ -49,7 +44,7 @@ export default function Header({
         </span>
       </div>
 
-      {/* Điểm Sao & Tắt/Mở âm thanh */}
+      {/* Điểm Sao & Cài Đặt */}
       <div className="flex items-center gap-3">
         {/* Số sao */}
         <motion.div 
@@ -71,22 +66,14 @@ export default function Header({
           </span>
         </motion.div>
 
-        {/* Nút Âm Thanh */}
+        {/* Nút Cài Đặt */}
         <motion.button
           whileTap={{ scale: 0.9 }}
-          onClick={handleSoundClick}
-          className={`w-10 h-10 flex items-center justify-center rounded-2xl border-3 border-slate-800 transition-colors ${
-            soundEnabled 
-              ? 'bg-emerald-300 hover:bg-emerald-200 shadow-[0_3px_0_0_#15803d]' 
-              : 'bg-rose-300 hover:bg-rose-200 shadow-[0_3px_0_0_#b91c1c]'
-          }`}
-          aria-label={soundEnabled ? "Tắt âm thanh" : "Bật âm thanh"}
+          onClick={handleSettingsClick}
+          className="w-10 h-10 flex items-center justify-center rounded-2xl border-3 border-slate-800 bg-sky-300 hover:bg-sky-200 shadow-[0_3px_0_0_#0369a1] active:translate-y-0.5 active:shadow-none"
+          aria-label="Cài đặt âm thanh"
         >
-          {soundEnabled ? (
-            <Volume2 className="w-5 h-5 text-emerald-900 stroke-[3]" />
-          ) : (
-            <VolumeX className="w-5 h-5 text-rose-900 stroke-[3]" />
-          )}
+          <Settings className="w-5 h-5 text-sky-950 stroke-[3]" />
         </motion.button>
       </div>
     </header>
