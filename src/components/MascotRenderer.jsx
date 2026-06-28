@@ -233,16 +233,86 @@ export default function MascotRenderer({
       try {
         const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const data = imgData.data;
+        const w = canvas.width;
+        const h = canvas.height;
 
-        // Xóa màu nền trắng: R >= 248 && G >= 248 && B >= 248 -> Alpha = 0
-        for (let i = 0; i < data.length; i += 4) {
-          const r = data[i];
-          const g = data[i + 1];
-          const b = data[i + 2];
-          if (r >= 248 && g >= 248 && b >= 248) {
-            data[i + 3] = 0;
+        // Thuật toán Loang (Flood fill) từ 4 góc để xác định vùng nền
+        const visited = new Uint8Array(w * h);
+        const queue = [];
+
+        // Kiểm tra xem một điểm pixel có phải là màu nền trắng hay không (R, G, B > 235)
+        const isBg = (x, y) => {
+          const idx = (y * w + x) * 4;
+          const r = data[idx];
+          const g = data[idx + 1];
+          const b = data[idx + 2];
+          return r > 235 && g > 235 && b > 235;
+        };
+
+        // Đẩy các điểm viền xung quanh ảnh vào hàng đợi
+        for (let x = 0; x < w; x++) {
+          if (isBg(x, 0)) { queue.push(x, 0); visited[0 * w + x] = 1; }
+          if (isBg(x, h - 1)) { queue.push(x, h - 1); visited[(h - 1) * w + x] = 1; }
+        }
+        for (let y = 0; y < h; y++) {
+          if (isBg(0, y)) { queue.push(0, y); visited[y * w + 0] = 1; }
+          if (isBg(w - 1, y)) { queue.push(w - 1, y); visited[y * w + (w - 1)] = 1; }
+        }
+
+        // Loang BFS tìm toàn bộ vùng nền trống liên kết bên ngoài
+        let head = 0;
+        const dx = [1, -1, 0, 0];
+        const dy = [0, 0, 1, -1];
+        while (head < queue.length) {
+          const cx = queue[head++];
+          const cy = queue[head++];
+
+          for (let i = 0; i < 4; i++) {
+            const nx = cx + dx[i];
+            const ny = cy + dy[i];
+            if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
+              const vidx = ny * w + nx;
+              if (visited[vidx] === 0 && isBg(nx, ny)) {
+                visited[vidx] = 1;
+                queue.push(nx, ny);
+              }
+            }
           }
         }
+
+        // Đặt độ trong suốt của vùng nền = 0, và làm mềm viền (anti-aliasing)
+        for (let y = 0; y < h; y++) {
+          for (let x = 0; x < w; x++) {
+            const vidx = y * w + x;
+            const idx = vidx * 4;
+            
+            if (visited[vidx] === 1) {
+              data[idx + 3] = 0; // Nền trong suốt
+            } else {
+              // Làm mềm các điểm viền tiếp giáp với nền để xóa viền trắng răng cưa
+              const r = data[idx];
+              const g = data[idx + 1];
+              const b = data[idx + 2];
+              if (r > 240 && g > 240 && b > 240) {
+                let nearBg = false;
+                for (let i = 0; i < 4; i++) {
+                  const nx = x + dx[i];
+                  const ny = y + dy[i];
+                  if (nx >= 0 && nx < w && ny >= 0 && ny < h && visited[ny * w + nx] === 1) {
+                    nearBg = true;
+                    break;
+                  }
+                }
+                if (nearBg) {
+                  const brightness = (r + g + b) / 3;
+                  const alpha = Math.max(0, Math.min(255, (255 - brightness) * 4));
+                  data[idx + 3] = alpha; // Mờ dần khi càng gần màu trắng của nền
+                }
+              }
+            }
+          }
+        }
+
         ctx.putImageData(imgData, 0, 0);
         const dataUrl = canvas.toDataURL();
         processedImageCache[activeImage] = dataUrl;
