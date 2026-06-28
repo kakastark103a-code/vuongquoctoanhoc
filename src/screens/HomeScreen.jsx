@@ -115,7 +115,9 @@ export default function HomeScreen({
         <div className="flex items-center gap-3">
           {/* Avatar live thu nhỏ */}
           <div className="w-12 h-12 bg-sky-100 border-2 border-slate-800 rounded-full flex items-center justify-center relative overflow-hidden">
-            <MascotRenderer mascot={mascot} equippedSkins={equippedSkins} size="sm" />
+            <div className="transform scale-[1.4] mt-1">
+              <MascotRenderer mascot={mascot} equippedSkins={equippedSkins} size="sm" />
+            </div>
           </div>
           <div className="text-left">
             <div className="text-[10px] font-black text-slate-400 uppercase tracking-wide">Hiệp sĩ nhí</div>
