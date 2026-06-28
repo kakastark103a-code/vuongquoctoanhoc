@@ -222,7 +222,7 @@ export default function MascotRenderer({
 
     let active = true;
     const img = new Image();
-    img.src = activeImage;
+    img.crossOrigin = "anonymous";
     img.onload = () => {
       const canvas = document.createElement('canvas');
       canvas.width = img.width;
@@ -340,6 +340,7 @@ export default function MascotRenderer({
         console.error("Canvas transparent background process fail:", e);
       }
     };
+    img.src = activeImage;
     return () => {
       active = false;
     };
