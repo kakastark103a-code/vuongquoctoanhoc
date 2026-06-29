@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Analytics } from '@vercel/analytics/react';
 import Header from './components/Header';
 import HomeScreen from './screens/HomeScreen';
 import GameScreen from './screens/GameScreen';
@@ -360,6 +361,9 @@ export default function App() {
         </AnimatePresence>
 
       </div>
+
+      {/* Vercel Web Analytics */}
+      <Analytics />
     </div>
   );
 }
